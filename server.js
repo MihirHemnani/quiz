@@ -31,7 +31,7 @@ app.post('/api/leaderboard', async (req, res) => {
         const results = await LeaderBoard.find({}).sort({
             score: -1, // Sort by score in descending order (highest score first)
             createdAt: 1, // If scores are the same, sort by createdAt in ascending order
-        });;
+        }).limit(10);
         res.status(200).json(results);
     } catch (err) {
         console.log(err)
