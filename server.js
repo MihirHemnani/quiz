@@ -27,7 +27,24 @@ const connectDatabase = async () => {
 app.post('/api/leaderboard', async (req, res) => {
     const {username, college, score, correctAnswers} = req.body;
     try {
-        await LeaderBoard.create({username: username.toLowerCase(), college:college.toLowerCase(), score, correctAnswers});
+        const existingEntry = await LeaderBoard.findOne({
+            username: username.toLowerCase(),
+            college: college.toLowerCase()
+        });
+        if (existingEntry && score > existingEntry.score) {
+            await LeaderBoard.updateOne(
+              { _id: existingEntry._id },
+              { score: score, correctAnswers: correctAnswers }
+            );
+        } else if (!existingEntry) {
+            // If the entry doesn't exist, create a new one
+            await LeaderBoard.create({
+              username: username.toLowerCase(),
+              college: college.toLowerCase(),
+              score: score,
+              correctAnswers: correctAnswers
+            });
+          }
         const results = await LeaderBoard.find({}).sort({
             score: -1, // Sort by score in descending order (highest score first)
             createdAt: 1, // If scores are the same, sort by createdAt in ascending order
