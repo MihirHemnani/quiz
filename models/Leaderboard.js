@@ -6,6 +6,11 @@ const LeaderBoard = new Schema({
         type: String,
         required: true
     },
+
+    email: {
+        type: String,
+        required: true
+    },
     
     college: {
         type: String,
@@ -17,11 +22,6 @@ const LeaderBoard = new Schema({
         required: true
     },
 
-    correctAnswers:{
-        type: Number,
-        required: true
-    }
-    
 }, {
     collection: "leaderboard",
     timestamps: true

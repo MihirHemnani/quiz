@@ -25,11 +25,10 @@ const connectDatabase = async () => {
 
 // creating the routes
 app.post('/api/leaderboard', async (req, res) => {
-    const {username, college, score, correctAnswers} = req.body;
+    const {username, email, college, score, correctAnswers} = req.body;
     try {
         const existingEntry = await LeaderBoard.findOne({
-            username: username.toLowerCase(),
-            college: college.toLowerCase()
+            email: email
         });
         if (existingEntry && score > existingEntry.score) {
             await LeaderBoard.updateOne(
@@ -42,17 +41,32 @@ app.post('/api/leaderboard', async (req, res) => {
               username: username.toLowerCase(),
               college: college.toLowerCase(),
               score: score,
-              correctAnswers: correctAnswers
             });
-          }
-        const results = await LeaderBoard.find({}).sort({
-            score: -1, // Sort by score in descending order (highest score first)
-            createdAt: 1, // If scores are the same, sort by createdAt in ascending order
-        }).limit(10);
-        res.status(200).json(results);
+        }
+        res.status(200).json({msg: "Done"});
     } catch (err) {
         console.log(err)
         res.status(400).json({ error: err.message });
+    }
+})
+
+app.post('/api/currentposition', async(req, res) => {
+    const {email} = req.body;
+
+    try {
+
+        const results = await LeaderBoard.find({}).sort({
+            score: -1,
+            updatedAt: 1,
+        });
+        
+        const userIndex = results.findIndex(user => user.email === email);
+        console.log(userIndex)
+        res.status(201).json({rank: userIndex + 1})
+
+    } catch(err) {
+        console.log(err)
+        res.status(404).json({msg: err})
     }
 })
 
