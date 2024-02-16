@@ -25,6 +25,7 @@ const connectDatabase = async () => {
 
 // creating the routes
 app.post('/api/leaderboard', async (req, res) => {
+    // console.log(req.body)
     const {username, email, college, score, correctAnswers} = req.body;
     try {
         const existingEntry = await LeaderBoard.findOne({
@@ -33,7 +34,7 @@ app.post('/api/leaderboard', async (req, res) => {
         if (existingEntry && score > existingEntry.score) {
             await LeaderBoard.updateOne(
               { _id: existingEntry._id },
-              { score: score, correctAnswers: correctAnswers }
+              { score: score }
             );
         } else if (!existingEntry) {
             // If the entry doesn't exist, create a new one
@@ -41,6 +42,7 @@ app.post('/api/leaderboard', async (req, res) => {
               username: username.toLowerCase(),
               college: college.toLowerCase(),
               score: score,
+              email: email
             });
         }
         res.status(200).json({msg: "Done"});
@@ -61,7 +63,7 @@ app.post('/api/currentposition', async(req, res) => {
         });
         
         const userIndex = results.findIndex(user => user.email === email);
-        console.log(userIndex)
+        // console.log(userIndex)
         res.status(201).json({rank: userIndex + 1})
 
     } catch(err) {
