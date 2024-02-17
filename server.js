@@ -27,12 +27,9 @@ const connectDatabase = async () => {
 app.post('/api/updatescore', async (req, res) => {
     const {email, score} = req.body;
     try {
-        const existingEntry = await LeaderBoard.findOne({
-            email: email
-        });
         
         await LeaderBoard.updateOne(
-            { _id: existingEntry._id },
+            { email: email },
             { score: score }
         );
 
