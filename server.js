@@ -24,28 +24,55 @@ const connectDatabase = async () => {
 }
 
 // creating the routes
-app.post('/api/leaderboard', async (req, res) => {
-    // console.log(req.body)
-    const {username, email, college, score, correctAnswers} = req.body;
+app.post('/api/updatescore', async (req, res) => {
+    const {email, score} = req.body;
     try {
         const existingEntry = await LeaderBoard.findOne({
             email: email
         });
-        if (existingEntry && score > existingEntry.score) {
-            await LeaderBoard.updateOne(
-              { _id: existingEntry._id },
-              { score: score }
-            );
-        } else if (!existingEntry) {
-            // If the entry doesn't exist, create a new one
-            await LeaderBoard.create({
-              username: username.toLowerCase(),
-              college: college.toLowerCase(),
-              score: score,
-              email: email
-            });
-        }
+        
+        await LeaderBoard.updateOne(
+            { _id: existingEntry._id },
+            { score: score }
+        );
+
         res.status(200).json({msg: "Done"});
+    } catch (err) {
+        console.log(err)
+        res.status(400).json({ error: err.message });
+    }
+})
+
+// creating the routes
+app.post('/api/register', async (req, res) => {
+    const {username, email, college, score} = req.body;
+    try {
+        // const existingEntry1 = await LeaderBoard.findOne({
+        //     email: email,
+        //     username: username,
+        //     college:college
+        // });
+        const existingEntry2 = await LeaderBoard.findOne({
+            email: email,
+        });
+        if (existingEntry2) {
+            // console.log("email used!")
+            res.status(200).json({msg: "emailidused"});
+        } 
+        // else if (existingEntry1) {
+        //     console.log("old user")
+        //     res.status(200).json({msg: "olduser"}, existingEntry1);
+        // } 
+        else {
+            console.log("new user")
+            await LeaderBoard.create({
+                username: username.toLowerCase(),
+                college: college.toLowerCase(),
+                score: score,
+                email: email
+            });
+            res.status(200).json({msg: "newuser"});
+        }
     } catch (err) {
         console.log(err)
         res.status(400).json({ error: err.message });
