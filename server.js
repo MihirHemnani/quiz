@@ -28,12 +28,13 @@ app.post('/api/updatescore', async (req, res) => {
     const {email, score} = req.body;
     try {
         
-        await LeaderBoard.updateOne(
+        const user = await LeaderBoard.updateOne(
             { email: email },
             { score: score }
         );
 
         res.status(200).json({msg: "Done"});
+
     } catch (err) {
         console.log(err)
         res.status(400).json({ error: err.message });
@@ -44,24 +45,21 @@ app.post('/api/updatescore', async (req, res) => {
 app.post('/api/register', async (req, res) => {
     const {username, email, college, score} = req.body;
     try {
-        // const existingEntry1 = await LeaderBoard.findOne({
-        //     email: email,
-        //     username: username,
-        //     college:college
-        // });
+        const existingEntry1 = await LeaderBoard.findOne({
+            email: email,
+            username: username,
+            college:college
+        });
         const existingEntry2 = await LeaderBoard.findOne({
             email: email,
         });
-        if (existingEntry2) {
-            // console.log("email used!")
+        if (existingEntry1) {
+            res.status(200).json({msg: "olduser", user: existingEntry1});
+        } 
+        else if (existingEntry2) {
             res.status(200).json({msg: "emailidused"});
         } 
-        // else if (existingEntry1) {
-        //     console.log("old user")
-        //     res.status(200).json({msg: "olduser"}, existingEntry1);
-        // } 
         else {
-            console.log("new user")
             await LeaderBoard.create({
                 username: username.toLowerCase(),
                 college: college.toLowerCase(),
