@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from 'cors';
 import LeaderBoard from "./models/Leaderboard.js"
+import Answers from "./models/Answers.js"
 
 const app = express();
 dotenv.config();
@@ -27,13 +28,20 @@ const connectDatabase = async () => {
 app.post('/api/updatescore', async (req, res) => {
     const {email, score} = req.body;
     try {
-        
-        const user = await LeaderBoard.updateOne(
-            { email: email },
-            { score: score }
-        );
 
-        res.status(200).json({msg: "Done"});
+        const user = await LeaderBoard.findOne({
+            email: email
+        })
+
+        if(user) {
+            await LeaderBoard.updateOne(
+                { email: email },
+                { score: score }
+            );
+            res.status(200).json({msg: true});
+        } else {
+            res.status(200).json({msg: false});
+        }
 
     } catch (err) {
         console.log(err)
@@ -76,17 +84,27 @@ app.post('/api/register', async (req, res) => {
 
 app.post('/api/currentposition', async(req, res) => {
     const {email} = req.body;
-
+    
     try {
 
-        const results = await LeaderBoard.find({}).sort({
-            score: -1,
-            updatedAt: 1,
-        });
-        
-        const userIndex = results.findIndex(user => user.email === email);
-        // console.log(userIndex)
-        res.status(201).json({rank: userIndex + 1})
+        const user = await LeaderBoard.findOne({
+            email: email
+        })
+
+        if(user) {
+
+            const results = await LeaderBoard.find({}).sort({
+                score: -1,
+                updatedAt: 1,
+            });
+            
+            const userIndex = results.findIndex(user => user.email === email);
+            // console.log(userIndex)
+            res.status(201).json({rank: userIndex + 1, msg: true})
+
+        } else {
+            res.status(201).json({msg: false})
+        }
 
     } catch(err) {
         console.log(err)
@@ -114,6 +132,22 @@ app.post('/api/user', async (req, res) => {
         res.status(200).json({msg: (result === null ? "NO" : "YES")});
     } catch (err) {
         console.log(err)
+        res.status(400).json({ error: err.message });
+    }
+})
+
+app.post('/api/answer', async (req, res) => {
+    const {questionId, answer} = req.body;
+    try {
+        const q = await Answers.findOne({questionId})
+
+        if(q.answer === answer) {
+            res.status(200).json({msg: true})
+        } else {
+            res.status(200).json({msg: false})
+        }
+    } catch (err) {
+        console.log(err);
         res.status(400).json({ error: err.message });
     }
 })
