@@ -45,18 +45,18 @@ app.post('/api/updatescore', async (req, res) => {
 app.post('/api/register', async (req, res) => {
     const {username, email, college, score} = req.body;
     try {
-        const existingEntry1 = await LeaderBoard.findOne({
-            email: email,
-            username: username,
-            college:college
-        });
+        // const existingEntry1 = await LeaderBoard.findOne({
+        //     email: email,
+        //     username: username,
+        //     college:college
+        // });
         const existingEntry2 = await LeaderBoard.findOne({
             email: email,
         });
-        if (existingEntry1) {
-            res.status(200).json({msg: "olduser", user: existingEntry1});
-        } 
-        else if (existingEntry2) {
+        // if (existingEntry1) {
+        //     res.status(200).json({msg: "olduser", user: existingEntry1});
+        // } 
+        if (existingEntry2) {
             res.status(200).json({msg: "emailidused"});
         } 
         else {
