@@ -26,7 +26,30 @@ const connectDatabase = async () => {
 
 // creating the routes
 app.post('/api/updatescore', async (req, res) => {
-    const {email, score} = req.body;
+    const {email} = req.body;
+    try {
+
+        const user = await LeaderBoard.findOne({
+            email: email
+        })
+        if(user) {
+            await LeaderBoard.updateOne(
+                { email: email },
+                { score: user.score + 1 }
+            );
+            res.status(200).json({msg: true});
+        } else {
+            res.status(200).json({msg: false});
+        }
+
+    } catch (err) {
+        console.log(err)
+        res.status(400).json({ error: err.message });
+    }
+})
+
+app.post('/api/getscore', async (req, res) => {
+    const {email} = req.body;
     try {
 
         const user = await LeaderBoard.findOne({
@@ -34,13 +57,9 @@ app.post('/api/updatescore', async (req, res) => {
         })
 
         if(user) {
-            await LeaderBoard.updateOne(
-                { email: email },
-                { score: score }
-            );
-            res.status(200).json({msg: true});
+            res.status(200).json({score: user.score});
         } else {
-            res.status(200).json({msg: false});
+            res.status(200).json({score: 0});
         }
 
     } catch (err) {
