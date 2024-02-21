@@ -70,7 +70,7 @@ app.post('/api/getscore', async (req, res) => {
 
 // creating the routes
 app.post('/api/register', async (req, res) => {
-    const {username, email, college, score} = req.body;
+    const {username, email, college} = req.body;
     try {
         // const existingEntry1 = await LeaderBoard.findOne({
         //     email: email,
@@ -90,7 +90,7 @@ app.post('/api/register', async (req, res) => {
             await LeaderBoard.create({
                 username: username.toLowerCase(),
                 college: college.toLowerCase(),
-                score: score,
+                score: 0,
                 email: email
             });
             res.status(200).json({msg: "newuser"});
