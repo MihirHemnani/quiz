@@ -138,9 +138,9 @@ app.post('/api/user', async (req, res) => {
 
 app.post('/api/answer', async (req, res) => {
     const {questionId, answer} = req.body;
+    const question = (questionId * 83) + 67;
     try {
-        const q = await Answers.findOne({questionId})
-
+        const q = await Answers.findOne({questionId: question})
         if(q.answer === answer) {
             res.status(200).json({msg: true})
         } else {
