@@ -25,30 +25,6 @@ const connectDatabase = async () => {
 }
 
 // creating the routes
-app.post('/api/updatescore', async (req, res) => {
-    const {email, questionId} = req.body;
-    try {
-        const user = await LeaderBoard.findOne({
-            email: email, 
-            score: questionId
-        })
-        if(user) {
-            if(user.score < 60) {
-                await LeaderBoard.updateOne(
-                    { email: email },
-                    { score: user.score + 1 }
-                );
-            }
-            res.status(200).json({msg: true});
-        } else {
-            res.status(200).json({msg: false});
-        }
-
-    } catch (err) {
-        console.log(err)
-        res.status(400).json({ error: err.message });
-    }
-})
 
 app.post('/api/getscore', async (req, res) => {
     const {email} = req.body;
