@@ -26,17 +26,19 @@ const connectDatabase = async () => {
 
 // creating the routes
 app.post('/api/updatescore', async (req, res) => {
-    const {email} = req.body;
+    const {email, questionId} = req.body;
     try {
-
         const user = await LeaderBoard.findOne({
-            email: email
+            email: email, 
+            score: questionId
         })
         if(user) {
-            await LeaderBoard.updateOne(
-                { email: email },
-                { score: user.score + 1 }
-            );
+            if(user.score < 60) {
+                await LeaderBoard.updateOne(
+                    { email: email },
+                    { score: user.score + 1 }
+                );
+            }
             res.status(200).json({msg: true});
         } else {
             res.status(200).json({msg: false});
@@ -119,7 +121,7 @@ app.post('/api/currentposition', async(req, res) => {
             
             const userIndex = results.findIndex(user => user.email === email);
             // console.log(userIndex)
-            res.status(201).json({rank: userIndex + 1, msg: true})
+            res.status(201).json({rank: userIndex + 1, msg: true, user})
 
         } else {
             res.status(201).json({msg: false})
