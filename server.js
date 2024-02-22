@@ -158,14 +158,27 @@ app.post('/api/user', async (req, res) => {
 })
 
 app.post('/api/answer', async (req, res) => {
-    const {questionId, answer} = req.body;
-    const question = (questionId * 83) + 67;
+    const {questionId, answer, email} = req.body;
     try {
-        const q = await Answers.findOne({questionId: question})
-        if(q.answer === answer) {
-            res.status(200).json({msg: true})
-        } else {
-            res.status(200).json({msg: false})
+        const user = await LeaderBoard.findOne({
+            email: email, 
+        })
+        if(questionId !== user.score) {
+            res.status(200).json({msg: false});
+        }else {
+            const question = (questionId * 83) + 67;
+            const q = await Answers.findOne({questionId: question})
+            if(q.answer === answer) {
+                if(user.score < 60) {
+                    await LeaderBoard.updateOne(
+                        { email: email },
+                        { score: user.score + 1 }
+                    );
+                }
+                res.status(200).json({msg: true})
+            } else {
+                res.status(200).json({msg: false})
+            }
         }
     } catch (err) {
         console.log(err);
